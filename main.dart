@@ -6,74 +6,86 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Ganjil Genap',
-      home: CekBilangan(),
+      home: FizzBuzzPage(),
     );
   }
 }
 
-class CekBilangan extends StatefulWidget {
+class FizzBuzzPage extends StatefulWidget {
   @override
-  _CekBilanganState createState() => _CekBilanganState();
+  _FizzBuzzPageState createState() => _FizzBuzzPageState();
 }
 
-class _CekBilanganState extends State<CekBilangan> {
+class _FizzBuzzPageState extends State<FizzBuzzPage> {
   final TextEditingController _controller = TextEditingController();
   String _hasil = "";
-  Color _warna = Colors.black;
+  String mode = "ganjilgenap";
 
-  String cekGanjilGenap(int angka) {
-    return (angka % 2 == 0) ? "Genap" : "Ganjil";
+  String fizzBuzz(int n) {
+    if (n % 3 == 0 && n % 5 == 0) return "FizzBuzz";
+    if (n % 3 == 0) return "Fizz";
+    if (n % 5 == 0) return "Buzz";
+    return n.toString();
+  }
+
+  String cekGanjilGenap(int n) {
+    return (n % 2 == 0) ? "Genap" : "Ganjil";
   }
 
   void proses() {
-    if (_controller.text.isEmpty) {
-      setState(() {
-        _hasil = "Input tidak boleh kosong";
-        _warna = Colors.red;
-      });
-      return;
-    }
-
     int? angka = int.tryParse(_controller.text);
 
     if (angka == null) {
       setState(() {
-        _hasil = "Input harus angka";
-        _warna = Colors.red;
+        _hasil = "Input tidak valid";
       });
       return;
     }
 
     setState(() {
-      _hasil = cekGanjilGenap(angka);
-      _warna = Colors.green;
+      _hasil = (mode == "ganjilgenap")
+          ? cekGanjilGenap(angka)
+          : fizzBuzz(angka);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Cek Ganjil Genap")),
+      appBar: AppBar(title: Text('Mode Pilihan')),
       body: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
+            DropdownButton<String>(
+              value: mode,
+              items: [
+                DropdownMenuItem(
+                  value: "ganjilgenap",
+                  child: Text("Ganjil Genap"),
+                ),
+                DropdownMenuItem(
+                  value: "fizzbuzz",
+                  child: Text("FizzBuzz"),
+                ),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  mode = value!;
+                });
+              },
+            ),
             TextField(
               controller: _controller,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(labelText: "Masukkan angka"),
             ),
-            SizedBox(height: 10),
             ElevatedButton(
               onPressed: proses,
-              child: Text("Cek"),
+              child: Text("Proses"),
             ),
             SizedBox(height: 20),
-            Text(
-              _hasil,
-              style: TextStyle(fontSize: 20, color: _warna),
-            )
+            Text(_hasil, style: TextStyle(fontSize: 20))
           ],
         ),
       ),
